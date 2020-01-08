@@ -108,18 +108,20 @@ def geturl(ra, dec, size=240, output_size=None, filters="grizy", format="jpg", c
     return url
 
 
-bcgcoords = parsebcgs("/home/elenarom/galaxy_alignment/bcgs.txt")[73:]
+bcgcoords = parsebcgs("/home/elenarom/galaxy_alignment/bcgs.txt")
 
 
 for i in range(len(bcgcoords)):
     ra = bcgcoords[i][1]
     dec = bcgcoords[i][2]
-    fitsurl = geturl(ra, dec, size=3600, filters="r", format="fits")
+    fitsurl = geturl(ra, dec, size=1000, filters="r", format="fits")
     
     if len(fitsurl) == 1:
         hdul = fits.open(fitsurl[0])
         name = "/home/elenarom/galaxy_alignment/fitsoutput/" + bcgcoords[i][0] + ".fits"
-        fits.writeto(name, hdul[0].data)
+        fits.writeto(name, hdul[0].data, header=hdul[0].header)
+    else:
+        print("missed " + str(bcgcoords[i][0]))
 
 
 
