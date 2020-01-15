@@ -9,6 +9,7 @@ import astropy as astropy
 from astropy.io import fits
 from astropy import units as u
 from astropy.coordinates import SkyCoord
+import os.path
 
 
 #######################################################
@@ -108,20 +109,28 @@ def geturl(ra, dec, size=240, output_size=None, filters="grizy", format="jpg", c
     return url
 
 
-bcgcoords = parsebcgs("/home/elenarom/galaxy_alignment/bcgs.txt")
+###########################################################################################################################
+
+
+bcgcoords = parsebcgs("/home/elenarom/galaxy_alignment/bcgs.txt")[159:] ### Change this number to change which are included
+
+### For future use: set bcgcoords to a list of [name, ra, dec], where ra and dec are in decimal degrees
 
 
 for i in range(len(bcgcoords)):
     ra = bcgcoords[i][1]
     dec = bcgcoords[i][2]
-    fitsurl = geturl(ra, dec, size=1000, filters="r", format="fits")
+    fitsurl = geturl(ra, dec, size=1000, filters="r", format="fits") ### Edit this to change image parameters
     
     if len(fitsurl) == 1:
         hdul = fits.open(fitsurl[0])
-        name = "/home/elenarom/galaxy_alignment/fitsoutput/" + bcgcoords[i][0] + ".fits"
-        fits.writeto(name, hdul[0].data, header=hdul[0].header)
+        name = "/home/elenarom/galaxy_alignment/fitsoutput/" + bcgcoords[i][0] + ".fits" ### Change path to wherever you want the fits files to be saved
+        if not os.path.exists(name):
+            fits.writeto(name, hdul[0].data, header=hdul[0].header)
+        else:
+            print("already have "+ bcgcoords[i][0]) ### if file with this name already exists
     else:
-        print("missed " + str(bcgcoords[i][0]))
+        print("missed " + str(bcgcoords[i][0])) ### if no image found in the PanSTARRS catalog
 
 
 
