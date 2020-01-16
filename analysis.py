@@ -3,8 +3,10 @@ from matplotlib import pyplot as plt
 import math
 import astropy as astropy
 from astropy import units as u
+from astropy import stats as astrostats
 from astropy.coordinates import SkyCoord
 from scipy import stats as stats
+from tikzplotlib import save as tikz_save
 
 def readin(raw_data):
     raw_list = []
@@ -123,6 +125,34 @@ for i in range(len(bcgangles)):
             if name == bcgdata[j][0] and name == inertiaclusterangles[k][0]: #checking that name matches for all 3 sets
                 anglecomparison.append([name, inertiaclusterangles[k][1], bcgangles[i][1], bcgdata[j][6]])
 
+# it would be a lot more efficient to use dictionaries for this.
+
+
+#### test to check which are missing
+
+names1 = []
+names2 = []
+names3 = []
+
+for i in bcgdata:
+    names1.append(i[0])
+
+for i in inertiaclusterangles:
+    names2.append(i[0])
+
+for i in bcgangles:
+    names3.append(i[0])
+
+for i in names1:
+    if i not in names2:
+        print(i, "not in inertiaclusterangles")
+
+for i in names1:
+    if i not in names3:
+        print(i, "not in bcgangles")
+
+###########################################
+
 
 ### fixing sign convention for bcg angle
 # for i in anglecomparison:
@@ -160,7 +190,10 @@ plt.grid(True)
 plt.xlabel("BCG/Cluster Velocity Difference")
 plt.ylabel("BCG/Cluster Angle Difference")
 plt.title("Relationship between Angle and Velocity Differences between BCG and Cluster")
+tikz_save("result.tikz")
 plt.show()
+
+############### Statistical tests #######################
 
 print("N=", len(anglecomparison))
 
@@ -170,18 +203,51 @@ def ks_in_range(data1, data2, lowerbound, upperbound):
         if data2[i] > lowerbound and data2[i] < upperbound:
             data_in_range.append(data1[i])
     test_stat_range = stats.kstest(data_in_range, 'uniform', args=(0,90))
-
+    
+    print("samples:", len(data_in_range))
     print("test stat for range", lowerbound, upperbound, test_stat_range)
 
+def kuiper_in_range(data1, data2, lowerbound, upperbound):
+    data_in_range = []
+    for i in range(len(data1)):
+        if data2[i] > lowerbound and data2[i] < upperbound:
+            data_in_range.append(data1[i])
+    test_stat_range = astrostats.kuiper(data_in_range, stats.uniform.cdf, args=(0,90))
+    
+    print("samples:", len(data_in_range))
+    print("test stat for range", lowerbound, upperbound, test_stat_range)
 
-
+print("################ K-S TEST ################")
 test_stat_overall = stats.kstest(angle_differences, 'uniform', args=(0,90))
 print("test_stat:", test_stat_overall)
 
-for i in range(0,3):
+for i in range(0,5):
     ks_in_range(angle_differences, velocity_diff_significances, i*0.2, (i+1)*0.2)
 
 
+print("############# KUIPER TEST ################")
+test_stat_overall = astrostats.kuiper(angle_differences, stats.uniform.cdf, args=(0,90))
+print("test_stat:", test_stat_overall)
+
+for i in range(0,5):
+    kuiper_in_range(angle_differences, velocity_diff_significances, i*0.2, (i+1)*0.2)
+
+
+############### Histogram showing angle differences ##################
+
+n_bins = 10
+
+fig, axs = plt.subplots()
+
+# We can set the number of bins with the `bins` kwarg
+axs.hist(angle_differences, bins=n_bins, color="black")
+plt.xlabel("Difference between cluster and BCG angle")
+plt.ylabel("Counts")
+tikz_save("anglehistogram.tikz")
+plt.show()
+
+test_stat_hist = stats.kstest(angle_differences, 'uniform', args=(0,90))
+print("test_stat_hist:", test_stat_overall)
 
 
 
