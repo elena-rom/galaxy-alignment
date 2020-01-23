@@ -8,9 +8,9 @@ It runs primarily on Python, using Astropy and Matplotlib. Data are used from th
 
 Inside the working directory, create a directory titled "data" with all *.csv files containing galaxy coordinates for each cluster. Then, run script.sh to determine the moment of inertia for each file. The option -w will write all results to a file called result.csv, while -p will print all results to terminal.
 
-Scrape.py can be used to download fits files centered at the BCG coordinate from the PanSTARR-1 survey. Several parameters must be set within this file.
+Scrape.py can be used to download fits files centered at the BCG coordinate from the PanSTARRS-1 survey. Several parameters must be set within this file.
 
-Axes of BCGs should be manually recorded by running Source Extractor on each fits file. These should be recorded in a *.csv file, and then analysis.py can be run to compare the moment of inertia angles to the BCG angles.
+Axes of BCGs should be manually recorded by running Source Extractor on each fits file. These should be recorded in a *.csv file, and then analysis.py can be run to compare the moment of inertia angles to the BCG angles and output plots and statistical tests.
 
 
 ## Prerequisites
