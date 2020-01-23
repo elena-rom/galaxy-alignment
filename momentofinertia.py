@@ -5,6 +5,7 @@ import math
 import astropy as astropy
 from astropy import units as u
 from astropy.coordinates import SkyCoord
+from tikzplotlib import save as tikz_save
 
 def readin(raw_data):
     raw_list = []
@@ -208,7 +209,7 @@ def plot(coordsxy, angle, name):
     xmiddle = (xlim[0] + xlim[1])/2.
     ymiddle = (ylim[0] + ylim[1])/2.
     
-    length = 0.05
+    length = 1
 
     endx = length * math.cos(math.radians(angle))
     endy = length * math.sin(math.radians(angle))
@@ -225,7 +226,9 @@ def plot(coordsxy, angle, name):
         newangle = 180 - newangle
     
     plt.title(name + " angle: " + str(newangle))
+    #tikz_save('momofinertia.tikz')
     plt.show()
+
 
 def calculate(coords=None, name=None, plotgals=True, radec=True, printinfo=False):
 
@@ -284,7 +287,7 @@ def calculate(coords=None, name=None, plotgals=True, radec=True, printinfo=False
     print(name + "," + str(newangle))
 
 
-calculate(plotgals=False, printinfo=False, radec=True)
+calculate(plotgals=True, printinfo=False, radec=True)
 
 
 
